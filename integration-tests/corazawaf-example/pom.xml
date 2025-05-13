@@ -46,7 +46,7 @@
       <version>2.13.1</version>
     </dependency>
     <dependency>
-      <groupId>io.roastedroot.quarkiverse.proxy-wasm</groupId>
+      <groupId>io.quarkiverse.proxy-wasm</groupId>
       <artifactId>quarkus-proxy-wasm</artifactId>
       <version>${quarkus-proxy-wasm.version}</version>
     </dependency>

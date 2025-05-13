@@ -32,7 +32,7 @@ For instance, with Maven, add the following dependency to your POM file:
 [source,xml,subs=attributes+]
 ----
 <dependency>
-    <groupId>io.roastedroot.quarkiverse.proxy-wasm</groupId>
+    <groupId>io.quarkiverse.proxy-wasm</groupId>
     <artifactId>quarkus-proxy-wasm</artifactId>
     <version>{project-version}</version>
 </dependency>
