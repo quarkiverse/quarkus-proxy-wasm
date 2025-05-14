@@ -23,8 +23,6 @@
     <quarkus.platform.version>3.22.2</quarkus.platform.version>
     <skipITs>true</skipITs>
     <surefire-plugin.version>3.5.3</surefire-plugin.version>
-    <!-- <chicory.version>1.3.0</chicory.version> -->
-    <quarkus-proxy-wasm.version>${project.version}</quarkus-proxy-wasm.version>
   </properties>
 
   <dependencyManagement>
@@ -48,7 +46,7 @@
     <dependency>
       <groupId>io.quarkiverse.proxy-wasm</groupId>
       <artifactId>quarkus-proxy-wasm</artifactId>
-      <version>${quarkus-proxy-wasm.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
