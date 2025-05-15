@@ -15,7 +15,8 @@ portable, sandboxed, and language-agnostic way, thanks to WebAssembly.
 This Quarkus extension allows you to use Proxy-Wasm plugins to filter requests to Jakarta REST (formerly known as JAX-RS)
 endpoints.
 
-Adding a Proxy-Wasm plugin to a JAX-RS endpoint is as simple as adding a `@ProxyWasm` annotation to a method:
+Adding a Proxy-Wasm plugin to a JAX-RS for a "waf" proxy-wasm module is as simple as adding a `@ProxyWasm` annotation 
+to a method or class:
 
 ```java
 package org.example;
@@ -38,9 +39,52 @@ public class Example {
 }
 ```
 
+And then using the [`Plugin builder`](https://javadoc.io/doc/io.roastedroot/proxy-wasm-java-host/latest/io/roastedroot/proxywasm/Plugin.Builder.html) API to configure the Proxy-Wasm plugin that has a matching name:
+
+```java
+package org.example;
+
+import com.dylibso.chicory.wasm.Parser;
+import com.dylibso.chicory.wasm.WasmModule;
+import io.roastedroot.proxywasm.StartException;
+import io.roastedroot.proxywasm.Plugin;
+import io.roastedroot.proxywasm.PluginFactory;
+import io.roastedroot.proxywasm.SimpleMetricsHandler;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
+
+@ApplicationScoped
+public class App {
+
+    private static WasmModule module =
+        Parser.parse(App.class.getResourceAsStream("coraza-proxy-wasm.wasm"));
+
+    @Produces
+    public PluginFactory waf() throws StartException {
+        return () ->
+                Plugin.builder(module)
+                        .withName("waf")
+                        .withPluginConfig(" ... the config passed to the plugin ... ")
+                        .withMetricsHandler(new SimpleMetricsHandler())
+                        .build();
+    }
+}
+```
+
+### Compiling WASM to Bytecode (Experimental)
+
+By default, wsm modules are executed using the [Chicory](https://chicory.dev/) interpreter.  But if you want the wasm to
+run a near native speed, you should compile the WASM to Java bytecode using the chicory WASM to bytecode compiler.
+Chicory supports compiling the WASM module at either build time or runtime.  If you want to compile your Quarkus app to 
+native,  then you MUST compile the WASM module at build (time to avoid the use of runtime reflection).  Please refer
+to the [Chicory documentation](https://chicory.dev/docs/) for more details on how to compile the WASM module to Java 
+bytecode.  Compiling will produce a machine factory that you should pass as an argument to the [withMachineFactory](https://javadoc.io/doc/io.roastedroot/proxy-wasm-java-host/latest/io/roastedroot/proxywasm/Plugin.Builder.html#withMachineFactory(java.util.function.Function)) 
+method to enable the bytecode execution of the WASM module.
+
 ## Docs
 
 * [Usage Guide](./docs/modules/ROOT/pages/index.adoc)
+* [Proxy-Wasm JavaDocs](https://javadoc.io/doc/io.roastedroot/proxy-wasm-java-host/latest/io/roastedroot/proxywasm/package-summary.html)
 
 ### Docs and SDKs for plugin authors:
 

@@ -23,6 +23,10 @@ Popular Proxy-Wasm plugins:
 * link:https://github.com/corazawaf/coraza-proxy-wasm[Coraza WAF]
 * link:https://github.com/Kuadrant/wasm-shim/[Kuadrant]
 
+Reference Docs for Java Developers:
+
+* link:https://javadoc.io/doc/io.roastedroot/proxy-wasm-java-host/latest/io/roastedroot/proxywasm/package-summary.html[Proxy-Wasm]
+
 == Installation
 
 If you want to use this extension, you need to add the `io.quarkiverse.proxy-wasm:quarkus-proxy-wasm` extension first to your build file.
@@ -171,3 +175,12 @@ public class App {
 }
 ----
 
+=== Compiling WASM to Bytecode (Experimental)
+
+By default, WASM modules are executed using the link:https://chicory.dev/[Chicory] interpreter.  But if you want the WASM to
+run a near native speed, you should compile the WASM to Java bytecode using the chicory WASM to bytecode compiler.
+Chicory supports compiling the WASM module at either build time or runtime.  If you want to compile your Quarkus app to
+native,  then you MUST compile the WASM module at build (time to avoid the use of runtime reflection).  Please refer
+to the link:https://chicory.dev/docs/[Chicory documentation] for more details on how to compile the WASM module to Java
+bytecode.  Compiling will produce a machine factory that you should pass as an argument to the link:https://javadoc.io/doc/io.roastedroot/proxy-wasm-java-host/latest/io/roastedroot/proxywasm/Plugin.Builder.html#withMachineFactory(java.util.function.Function)[withMachineFactory]
+method to enable the bytecode execution of the WASM module.
