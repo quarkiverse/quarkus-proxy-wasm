@@ -13,7 +13,6 @@ import com.dylibso.chicory.wasm.WasmModule;
 import com.google.gson.Gson;
 
 import io.roastedroot.proxywasm.PluginFactory;
-import io.roastedroot.proxywasm.StartException;
 
 /**
  * Application configuration for integration tests.
@@ -35,7 +34,6 @@ public class App {
      * Produces a {@link PluginFactory} for header manipulation tests (shared instance).
      *
      * @return A configured {@link PluginFactory}.
-     * @throws StartException If plugin initialization fails.
      */
     @Produces
     public PluginFactory headerTests() {
@@ -52,7 +50,6 @@ public class App {
      * Produces a {@link PluginFactory} for header manipulation tests (non-shared instances).
      *
      * @return A configured {@link PluginFactory}.
-     * @throws StartException If plugin initialization fails.
      */
     @Produces
     public PluginFactory headerTestsNotShared() {
@@ -68,7 +65,6 @@ public class App {
      * Produces a {@link PluginFactory} for tick-based tests.
      *
      * @return A configured {@link PluginFactory}.
-     * @throws StartException If plugin initialization fails.
      */
     @Produces
     public PluginFactory tickTests() {
@@ -85,7 +81,6 @@ public class App {
      * Produces a {@link PluginFactory} for Foreign Function Interface (FFI) tests.
      *
      * @return A configured {@link PluginFactory}.
-     * @throws StartException If plugin initialization fails.
      */
     @Produces
     public PluginFactory ffiTests() {
@@ -117,7 +112,7 @@ public class App {
      * Produces a {@link PluginFactory} for HTTP call tests.
      *
      * @return A configured {@link PluginFactory}.
-     * @throws StartException If plugin initialization fails.
+     * @throws URISyntaxException If the upstream URI is malformed.
      */
     @Produces
     public PluginFactory httpCallTests() throws URISyntaxException {

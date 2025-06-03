@@ -17,7 +17,6 @@ import org.example.internal.WasmShim;
 import io.roastedroot.proxywasm.LogHandler;
 import io.roastedroot.proxywasm.PluginFactory;
 import io.roastedroot.proxywasm.SimpleMetricsHandler;
-import io.roastedroot.proxywasm.StartException;
 
 /**
  * Application configuration class for the Kuadrant example.
@@ -54,7 +53,7 @@ public class App {
      * logger, plugin configuration, upstream URIs, and metrics handler.
      *
      * @return A configured PluginFactory for the Kuadrant plugin.
-     * @throws StartException if there is an error during plugin initialization.
+     * @throws URISyntaxException If the limitador URL is malformed.
      */
     @Produces
     public PluginFactory kuadrant() throws URISyntaxException {

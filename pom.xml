@@ -39,6 +39,27 @@
     <chicory.version>1.4.0</chicory.version>
   </properties>
 
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <configuration>
+            <!-- Exclude internal packages -->
+            <sourceFileExcludes>
+              <sourceFileExclude>**/internal/**</sourceFileExclude>
+            </sourceFileExcludes>
+            <failOnWarnings>true</failOnWarnings>
+            <!-- Additional configuration for better javadoc generation -->
+            <doclint>none</doclint>
+            <quiet>true</quiet>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
