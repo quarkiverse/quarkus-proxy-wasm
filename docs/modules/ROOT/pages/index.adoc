@@ -22,6 +22,7 @@ Popular Proxy-Wasm plugins:
 
 * link:https://github.com/corazawaf/coraza-proxy-wasm[Coraza WAF]
 * link:https://github.com/Kuadrant/wasm-shim/[Kuadrant]
+* link:https://higress.cn/en/plugin/[Higress]
 
 Reference Docs for Java Developers:
 

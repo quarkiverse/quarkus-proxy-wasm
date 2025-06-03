@@ -4,8 +4,9 @@
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![Version](https://img.shields.io/maven-central/v/io.quarkiverse.proxy-wasm/quarkus-proxy-wasm?logo=apache-maven&style=flat-square)](https://central.sonatype.com/artifact/io.quarkiverse.proxy-wasm/quarkus-proxy-wasm-parent)
+[![Javadocs](http://javadoc.io/badge/io.quarkiverse.proxy-wasm/quarkus-proxy-wasm.svg)](http://javadoc.io/doc/io.quarkiverse.proxy-wasm/quarkus-proxy-wasm)
 
-The Java implementation for proxy-wasm, enabling developer to run Proxy-Wasm plugins in Java.
+The Quarkus implementation for proxy-wasm, enabling developer to run Proxy-Wasm plugins in Java.
 
 ## Overview
 
@@ -151,6 +152,11 @@ for more details.
 * [Usage Guide](./docs/modules/ROOT/pages/index.adoc)
 * [Proxy-Wasm JavaDocs](https://javadoc.io/doc/io.roastedroot/proxy-wasm-java-host/latest/io/roastedroot/proxywasm/package-summary.html)
 
+## Examples
+
+* [Coraza Example](integration-tests/corazawaf-example) - Quarkus app that uses the Coraza WAF Proxy-Wasm plugin to filter requests.
+* [Kuadrant Example](integration-tests/kuadrant-example) - Quarkus app that uses the Kuadrant Proxy-Wasm plugin to filter requests.
+
 ### Docs and SDKs for plugin authors:
 
 * [ABI specification](https://github.com/istio-ecosystem/wasm-extensions[Proxy-Wasm)
@@ -161,9 +167,9 @@ for more details.
 
 ### Popular Proxy-Wasm plugins:
 
-* [Coraza WAF](link:https://github.com/corazawaf/coraza-proxy-wasm)
-* [Kuadrant](link:https://github.com/Kuadrant/wasm-shim/)
-
+* [Coraza WAF](https://github.com/corazawaf/coraza-proxy-wasm)
+* [Kuadrant](https://github.com/Kuadrant/wasm-shim/)
+* [Higress](https://higress.cn/en/plugin/)
 
 ## Building
 
