@@ -35,8 +35,8 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <quarkus.version>3.23.0</quarkus.version>
     <surefire-plugin.version>3.5.2</surefire-plugin.version>
-    <proxy-wasm.version>999-SNAPSHOT</proxy-wasm.version>
     <chicory.version>1.4.0</chicory.version>
+    <proxy-wasm.version>0.0.4</proxy-wasm.version>
   </properties>
 
   <build>
@@ -56,6 +56,16 @@
             <quiet>true</quiet>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-maven-plugin</artifactId>
+          <version>${quarkus.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-config-doc-maven-plugin</artifactId>
+          <version>${quarkus.version}</version>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
@@ -71,6 +81,7 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+  
 
   <profiles>
     <profile>
