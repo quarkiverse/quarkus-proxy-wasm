@@ -222,7 +222,7 @@ To compile your WASM module at build time, add the Chicory compiler Maven plugin
     <artifactId>chicory-compiler-maven-plugin</artifactId>
     <executions>
         <execution>
-            <id>wasm-shim</id>
+            <id>chicory-compile</id>
             <goals>
                 <goal>compile</goal>
             </goals>
