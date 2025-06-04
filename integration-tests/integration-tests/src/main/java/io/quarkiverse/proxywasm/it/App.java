@@ -1,19 +1,18 @@
 package io.quarkiverse.proxywasm.it;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 
-import org.example.internal.MainWasmModule;
+import org.example.internal.MainWasm;
 
 import com.dylibso.chicory.wasm.WasmModule;
 import com.google.gson.Gson;
 
-import io.roastedroot.proxywasm.Plugin;
 import io.roastedroot.proxywasm.PluginFactory;
-import io.roastedroot.proxywasm.StartException;
 
 /**
  * Application configuration for integration tests.
@@ -29,22 +28,21 @@ public class App {
     }
 
     private static final Gson gson = new Gson();
-    private WasmModule MODULE = MainWasmModule.load();
+    private WasmModule MODULE = MainWasm.load();
 
     /**
      * Produces a {@link PluginFactory} for header manipulation tests (shared instance).
      *
      * @return A configured {@link PluginFactory}.
-     * @throws StartException If plugin initialization fails.
      */
     @Produces
-    public PluginFactory headerTests() throws StartException {
-        return () -> Plugin.builder(MODULE)
+    public PluginFactory headerTests() {
+        return PluginFactory.builder(MODULE)
+                .withMachineFactory(MainWasm::create)
                 .withName("headerTests")
                 .withShared(true)
                 .withLogger(new MockLogger("headerTests"))
                 .withPluginConfig(gson.toJson(Map.of("type", "headerTests")))
-                .withMachineFactory(MainWasmModule::create)
                 .build();
     }
 
@@ -52,15 +50,14 @@ public class App {
      * Produces a {@link PluginFactory} for header manipulation tests (non-shared instances).
      *
      * @return A configured {@link PluginFactory}.
-     * @throws StartException If plugin initialization fails.
      */
     @Produces
-    public PluginFactory headerTestsNotShared() throws StartException {
-        return () -> Plugin.builder(MODULE)
+    public PluginFactory headerTestsNotShared() {
+        return PluginFactory.builder(MODULE)
+                .withMachineFactory(MainWasm::create)
                 .withName("headerTestsNotShared")
                 .withLogger(new MockLogger("headerTestsNotShared"))
                 .withPluginConfig(gson.toJson(Map.of("type", "headerTests")))
-                .withMachineFactory(MainWasmModule::create)
                 .build();
     }
 
@@ -68,16 +65,15 @@ public class App {
      * Produces a {@link PluginFactory} for tick-based tests.
      *
      * @return A configured {@link PluginFactory}.
-     * @throws StartException If plugin initialization fails.
      */
     @Produces
-    public PluginFactory tickTests() throws StartException {
-        return () -> Plugin.builder(MODULE)
+    public PluginFactory tickTests() {
+        return PluginFactory.builder(MODULE)
+                .withMachineFactory(MainWasm::create)
                 .withName("tickTests")
                 .withShared(true)
                 .withLogger(new MockLogger("tickTests"))
                 .withPluginConfig(gson.toJson(Map.of("type", "tickTests")))
-                .withMachineFactory(MainWasmModule::create)
                 .build();
     }
 
@@ -85,17 +81,16 @@ public class App {
      * Produces a {@link PluginFactory} for Foreign Function Interface (FFI) tests.
      *
      * @return A configured {@link PluginFactory}.
-     * @throws StartException If plugin initialization fails.
      */
     @Produces
-    public PluginFactory ffiTests() throws StartException {
-        return () -> Plugin.builder(MODULE)
+    public PluginFactory ffiTests() {
+        return PluginFactory.builder(MODULE)
+                .withMachineFactory(MainWasm::create)
                 .withName("ffiTests")
                 .withLogger(new MockLogger("ffiTests"))
                 .withPluginConfig(
                         gson.toJson(Map.of("type", "ffiTests", "function", "reverse")))
                 .withForeignFunctions(Map.of("reverse", App::reverse))
-                .withMachineFactory(MainWasmModule::create)
                 .build();
     }
 
@@ -117,11 +112,12 @@ public class App {
      * Produces a {@link PluginFactory} for HTTP call tests.
      *
      * @return A configured {@link PluginFactory}.
-     * @throws StartException If plugin initialization fails.
+     * @throws URISyntaxException If the upstream URI is malformed.
      */
     @Produces
-    public PluginFactory httpCallTests() throws StartException {
-        return () -> Plugin.builder(MODULE)
+    public PluginFactory httpCallTests() throws URISyntaxException {
+        return PluginFactory.builder(MODULE)
+                .withMachineFactory(MainWasm::create)
                 .withName("httpCallTests")
                 .withLogger(new MockLogger("httpCallTests"))
                 .withPluginConfig(
@@ -131,7 +127,6 @@ public class App {
                                         "upstream", "web_service",
                                         "path", "/ok")))
                 .withUpstreams(Map.of("web_service", new URI("http://localhost:8081")))
-                .withMachineFactory(MainWasmModule::create)
                 .build();
     }
 }

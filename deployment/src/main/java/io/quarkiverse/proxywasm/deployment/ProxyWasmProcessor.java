@@ -13,21 +13,41 @@ import io.quarkus.jaxrs.spi.deployment.AdditionalJaxRsResourceMethodAnnotationsB
 import io.roastedroot.proxywasm.jaxrs.ProxyWasm;
 import io.roastedroot.proxywasm.jaxrs.cdi.ProxyWasmFeature;
 
-class ProxyWasmProcessor {
+/**
+ * Quarkus build-time processor for the Proxy-Wasm extension.
+ * This processor configures the necessary components for the Proxy-Wasm integration
+ * including CDI beans, JAX-RS annotations, and feature registration.
+ */
+public class ProxyWasmProcessor {
 
     private static final String FEATURE = "proxy-wasm";
 
+    /**
+     * Registers the proxy-wasm feature with Quarkus.
+     *
+     * @return A FeatureBuildItem representing the proxy-wasm feature.
+     */
     @BuildStep
     FeatureBuildItem feature() {
         return new FeatureBuildItem(FEATURE);
     }
 
+    /**
+     * Registers additional CDI beans required for Proxy-Wasm functionality.
+     *
+     * @return An AdditionalBeanBuildItem containing the required beans.
+     */
     @BuildStep
     AdditionalBeanBuildItem resources() {
         return new AdditionalBeanBuildItem(
                 ProxyWasmFeature.class, VertxServerAdaptor.class, VertxHttpRequestAdaptor.class);
     }
 
+    /**
+     * Registers the ProxyWasm annotation as a JAX-RS resource method annotation.
+     *
+     * @return An AdditionalJaxRsResourceMethodAnnotationsBuildItem containing the ProxyWasm annotation.
+     */
     @BuildStep
     public AdditionalJaxRsResourceMethodAnnotationsBuildItem annotations() {
         return new AdditionalJaxRsResourceMethodAnnotationsBuildItem(

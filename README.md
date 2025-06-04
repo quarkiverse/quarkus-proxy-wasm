@@ -4,8 +4,9 @@
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![Version](https://img.shields.io/maven-central/v/io.quarkiverse.proxy-wasm/quarkus-proxy-wasm?logo=apache-maven&style=flat-square)](https://central.sonatype.com/artifact/io.quarkiverse.proxy-wasm/quarkus-proxy-wasm-parent)
+[![Javadocs](http://javadoc.io/badge/io.quarkiverse.proxy-wasm/quarkus-proxy-wasm.svg)](http://javadoc.io/doc/io.quarkiverse.proxy-wasm/quarkus-proxy-wasm)
 
-The Java implementation for proxy-wasm, enabling developer to run Proxy-Wasm plugins in Java.
+The Quarkus implementation for proxy-wasm, enabling developer to run Proxy-Wasm plugins in Java.
 
 ## Overview
 
@@ -39,15 +40,13 @@ public class Example {
 }
 ```
 
-And then using the [`Plugin builder`](https://javadoc.io/doc/io.roastedroot/proxy-wasm-java-host/latest/io/roastedroot/proxywasm/Plugin.Builder.html) API to configure the Proxy-Wasm plugin that has a matching name:
+And then using the [`PluginFactory builder`](https://javadoc.io/doc/io.roastedroot/proxy-wasm-java-host/latest/io/roastedroot/proxywasm/PluginFactory.Builder.html) API to configure the Proxy-Wasm plugin that has a matching name:
 
 ```java
 package org.example;
 
 import com.dylibso.chicory.wasm.Parser;
 import com.dylibso.chicory.wasm.WasmModule;
-import io.roastedroot.proxywasm.StartException;
-import io.roastedroot.proxywasm.Plugin;
 import io.roastedroot.proxywasm.PluginFactory;
 import io.roastedroot.proxywasm.SimpleMetricsHandler;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -60,9 +59,8 @@ public class App {
         Parser.parse(App.class.getResourceAsStream("coraza-proxy-wasm.wasm"));
 
     @Produces
-    public PluginFactory waf() throws StartException {
-        return () ->
-                Plugin.builder(module)
+    public PluginFactory waf() {
+        return PluginFactory.builder(module)
                         .withName("waf")
                         .withPluginConfig(" ... the config passed to the plugin ... ")
                         .withMetricsHandler(new SimpleMetricsHandler())
@@ -71,20 +69,93 @@ public class App {
 }
 ```
 
-### Compiling WASM to Bytecode (Experimental)
+### Compiling WASM to Bytecode
 
-By default, wsm modules are executed using the [Chicory](https://chicory.dev/) interpreter.  But if you want the wasm to
+By default, WASM modules are executed using the [Chicory](https://chicory.dev/) interpreter.  But if you want the WASM code to
 run a near native speed, you should compile the WASM to Java bytecode using the chicory WASM to bytecode compiler.
-Chicory supports compiling the WASM module at either build time or runtime.  If you want to compile your Quarkus app to 
-native,  then you MUST compile the WASM module at build (time to avoid the use of runtime reflection).  Please refer
-to the [Chicory documentation](https://chicory.dev/docs/) for more details on how to compile the WASM module to Java 
-bytecode.  Compiling will produce a machine factory that you should pass as an argument to the [withMachineFactory](https://javadoc.io/doc/io.roastedroot/proxy-wasm-java-host/latest/io/roastedroot/proxywasm/Plugin.Builder.html#withMachineFactory(java.util.function.Function)) 
-method to enable the bytecode execution of the WASM module.
+Chicory supports compiling the WASM module at either build time or runtime.  
+
+#### Runtime Compilation
+
+To enable runtime compilation, you need just need to add the following dependency to your `pom.xml`:
+
+```xml  
+<dependency>
+  <groupId>com.dylibso.chicory</groupId>
+  <artifactId>compiler</artifactId>
+</dependency>
+```
+
+You then enable it on the PluginFactory builder by using it as the machine factory:
+
+```java
+@Produces
+public PluginFactory waf() {
+    return PluginFactory.builder(module)
+                    .withMachineFactory(MachineFactoryCompiler::compile)
+                    .withName("waf")
+                    .withPluginConfig(CONFIG)
+                    .withMetricsHandler(new SimpleMetricsHandler())
+                    .build();
+}
+```
+
+Please refer to the [Chicory Runtime Compilation documentation](https://chicory.dev/docs/usage/runtime-compiler)
+for more details.
+
+#### Build time Compilation
+
+If you want to compile your Quarkus app to native,  then you MUST compile the WASM module at build time to avoid the use 
+of runtime reflection.  
+
+To compile your WASM module at build time, add the Chicory compiler Maven plugin to your `pom.xml`:
+
+```xml
+<plugin>
+    <groupId>com.dylibso.chicory</groupId>
+    <artifactId>chicory-compiler-maven-plugin</artifactId>
+    <executions>
+        <execution>
+            <id>wasm-shim</id>
+            <goals>
+                <goal>compile</goal>
+            </goals>
+            <configuration>
+                <name>org.example.internal.WasmShim</name>
+                <wasm>src/main/resources/plugin.wasm</wasm>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+```
+
+This will generate a `WasmShim` class that provides both a `load()` method to get the `WasmModule` and a `create()` 
+method for the machine factory. Update your plugin factory to use the compiled module:
+
+```java
+@Produces
+public PluginFactory waf() {
+    return PluginFactory.builder(WasmShim.load())
+                    .withMachineFactory(WasmShim::create)
+                    .withName("waf")
+                    .withPluginConfig(CONFIG)
+                    .withMetricsHandler(new SimpleMetricsHandler())
+                    .build();
+}
+```
+
+Please refer to the [Chicory Build time Compilation documentation](https://chicory.dev/docs/usage/build-time-compiler)
+for more details.
 
 ## Docs
 
 * [Usage Guide](./docs/modules/ROOT/pages/index.adoc)
 * [Proxy-Wasm JavaDocs](https://javadoc.io/doc/io.roastedroot/proxy-wasm-java-host/latest/io/roastedroot/proxywasm/package-summary.html)
+
+## Examples
+
+* [Coraza Example](integration-tests/corazawaf-example) - Quarkus app that uses the Coraza WAF Proxy-Wasm plugin to filter requests.
+* [Kuadrant Example](integration-tests/kuadrant-example) - Quarkus app that uses the Kuadrant Proxy-Wasm plugin to filter requests.
 
 ### Docs and SDKs for plugin authors:
 
@@ -96,9 +167,9 @@ method to enable the bytecode execution of the WASM module.
 
 ### Popular Proxy-Wasm plugins:
 
-* [Coraza WAF](link:https://github.com/corazawaf/coraza-proxy-wasm)
-* [Kuadrant](link:https://github.com/Kuadrant/wasm-shim/)
-
+* [Coraza WAF](https://github.com/corazawaf/coraza-proxy-wasm)
+* [Kuadrant](https://github.com/Kuadrant/wasm-shim/)
+* [Higress](https://higress.cn/en/plugin/)
 
 ## Building
 

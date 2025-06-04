@@ -47,13 +47,13 @@
     <plugins>
       <plugin>
         <groupId>com.dylibso.chicory</groupId>
-        <artifactId>aot-maven-plugin-experimental</artifactId>
+        <artifactId>chicory-compiler-maven-plugin</artifactId>
         <version>${chicory.version}</version>
         <executions>
           <execution>
             <id>wasm-shim</id>
             <goals>
-              <goal>wasm-aot-gen</goal>
+              <goal>compile</goal>
             </goals>
             <configuration>
               <name>org.example.internal.MainWasm</name>

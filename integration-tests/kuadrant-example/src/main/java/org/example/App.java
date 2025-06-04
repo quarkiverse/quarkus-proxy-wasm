@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -11,13 +12,11 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.example.internal.WasmShimModule;
+import org.example.internal.WasmShim;
 
 import io.roastedroot.proxywasm.LogHandler;
-import io.roastedroot.proxywasm.Plugin;
 import io.roastedroot.proxywasm.PluginFactory;
 import io.roastedroot.proxywasm.SimpleMetricsHandler;
-import io.roastedroot.proxywasm.StartException;
 
 /**
  * Application configuration class for the Kuadrant example.
@@ -54,13 +53,13 @@ public class App {
      * logger, plugin configuration, upstream URIs, and metrics handler.
      *
      * @return A configured PluginFactory for the Kuadrant plugin.
-     * @throws StartException if there is an error during plugin initialization.
+     * @throws URISyntaxException If the limitador URL is malformed.
      */
     @Produces
-    public PluginFactory kuadrant() throws StartException {
-        return () -> Plugin.builder(WasmShimModule.load())
+    public PluginFactory kuadrant() throws URISyntaxException {
+        return PluginFactory.builder(WasmShim.load())
+                .withMachineFactory(WasmShim::create)
                 .withName("kuadrant")
-                .withMachineFactory(WasmShimModule::create)
                 .withLogger(DEBUG ? LogHandler.SYSTEM : null)
                 .withPluginConfig(CONFIG)
                 .withUpstreams(Map.of("limitador", new URI(limitadorUrl)))

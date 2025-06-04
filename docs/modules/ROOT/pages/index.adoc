@@ -22,6 +22,7 @@ Popular Proxy-Wasm plugins:
 
 * link:https://github.com/corazawaf/coraza-proxy-wasm[Coraza WAF]
 * link:https://github.com/Kuadrant/wasm-shim/[Kuadrant]
+* link:https://higress.cn/en/plugin/[Higress]
 
 Reference Docs for Java Developers:
 
@@ -104,7 +105,6 @@ package org.example;
 import com.dylibso.chicory.wasm.Parser;
 import com.dylibso.chicory.wasm.WasmModule;
 import io.roastedroot.proxywasm.StartException;
-import io.roastedroot.proxywasm.Plugin;
 import io.roastedroot.proxywasm.PluginFactory;
 import io.roastedroot.proxywasm.SimpleMetricsHandler;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -132,9 +132,8 @@ public class App {
 
     // creates a plugin factory that loads the wasm module and configuration
     @Produces
-    public PluginFactory waf() throws StartException {
-        return () ->
-                Plugin.builder(module)
+    public PluginFactory waf() {
+        return PluginFactory.builder(module)
                         .withName("waf")                                            <2>
                         .withPluginConfig(CONFIG)
                         .withMetricsHandler(new SimpleMetricsHandler())             <3>
@@ -175,12 +174,80 @@ public class App {
 }
 ----
 
-=== Compiling WASM to Bytecode (Experimental)
+=== Compiling WASM to Bytecode
 
-By default, WASM modules are executed using the link:https://chicory.dev/[Chicory] interpreter.  But if you want the WASM to
-run a near native speed, you should compile the WASM to Java bytecode using the chicory WASM to bytecode compiler.
-Chicory supports compiling the WASM module at either build time or runtime.  If you want to compile your Quarkus app to
-native,  then you MUST compile the WASM module at build (time to avoid the use of runtime reflection).  Please refer
-to the link:https://chicory.dev/docs/[Chicory documentation] for more details on how to compile the WASM module to Java
-bytecode.  Compiling will produce a machine factory that you should pass as an argument to the link:https://javadoc.io/doc/io.roastedroot/proxy-wasm-java-host/latest/io/roastedroot/proxywasm/Plugin.Builder.html#withMachineFactory(java.util.function.Function)[withMachineFactory]
-method to enable the bytecode execution of the WASM module.
+By default, WASM modules are executed using the https://chicory.dev/[Chicory] interpreter.
+But if you want the WASM code to run at near native speed, you should compile the WASM to Java bytecode using the Chicory WASM to bytecode compiler.
+Chicory supports compiling the WASM module at either build time or runtime.
+
+==== Runtime Compilation
+
+To enable runtime compilation, you just need to add the following dependency to your `pom.xml`:
+
+[source,xml]
+----
+<dependency>
+  <groupId>com.dylibso.chicory</groupId>
+  <artifactId>compiler</artifactId>
+</dependency>
+----
+
+You then enable it on the PluginFactory builder by using it as the machine factory:
+
+[source,java]
+----
+@Produces
+public PluginFactory waf() {
+    return PluginFactory.builder(module)
+                    .withMachineFactory(MachineFactoryCompiler::compile)
+                    .withName("waf")
+                    .withPluginConfig(CONFIG)
+                    .withMetricsHandler(new SimpleMetricsHandler())
+                    .build();
+}
+----
+
+Please refer to the https://chicory.dev/docs/usage/runtime-compiler[Chicory Runtime Compilation documentation] for more details.
+
+==== Build time Compilation
+
+If you want to compile your Quarkus app to native, then you *MUST* compile the WASM module at build time to avoid the use of runtime reflection.
+
+To compile your WASM module at build time, add the Chicory compiler Maven plugin to your `pom.xml`:
+
+[source,xml]
+----
+<plugin>
+    <groupId>com.dylibso.chicory</groupId>
+    <artifactId>chicory-compiler-maven-plugin</artifactId>
+    <executions>
+        <execution>
+            <id>wasm-shim</id>
+            <goals>
+                <goal>compile</goal>
+            </goals>
+            <configuration>
+                <name>org.example.internal.WasmShim</name>
+                <wasm>src/main/resources/plugin.wasm</wasm>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+----
+
+This will generate a `WasmShim` class that provides both a `load()` method to get the `WasmModule` and a `create()` method for the machine factory. Update your plugin factory to use the compiled module:
+
+[source,java]
+----
+@Produces
+public PluginFactory waf() {
+    return PluginFactory.builder(WasmShim.load())
+                    .withMachineFactory(WasmShim::create)
+                    .withName("waf")
+                    .withPluginConfig(CONFIG)
+                    .withMetricsHandler(new SimpleMetricsHandler())
+                    .build();
+}
+----
+
+Please refer to the https://chicory.dev/docs/usage/build-time-compiler[Chicory Build time Compilation documentation] for more details.

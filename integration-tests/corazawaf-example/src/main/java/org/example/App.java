@@ -8,12 +8,9 @@ import java.nio.charset.StandardCharsets;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 
-import org.example.internal.CorazaWAFModule;
-
-import com.dylibso.chicory.wasm.WasmModule;
+import org.example.internal.CorazaWAF;
 
 import io.roastedroot.proxywasm.LogHandler;
-import io.roastedroot.proxywasm.Plugin;
 import io.roastedroot.proxywasm.PluginFactory;
 import io.roastedroot.proxywasm.SimpleMetricsHandler;
 
@@ -30,8 +27,6 @@ public class App {
     public App() {
         // Default constructor
     }
-
-    private static WasmModule module = CorazaWAFModule.load();
 
     static final String CONFIG;
 
@@ -54,9 +49,9 @@ public class App {
      */
     @Produces
     public PluginFactory waf() {
-        return () -> Plugin.builder(module)
+        return PluginFactory.builder(CorazaWAF.load())
+                .withMachineFactory(CorazaWAF::create)
                 .withName("waf")
-                .withMachineFactory(CorazaWAFModule::create)
                 .withShared(true)
                 .withLogger(DEBUG ? LogHandler.SYSTEM : null)
                 .withPluginConfig(CONFIG)
