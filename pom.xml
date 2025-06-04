@@ -10,7 +10,7 @@
 
   <groupId>io.quarkiverse.proxy-wasm</groupId>
   <artifactId>quarkus-proxy-wasm-parent</artifactId>
-  <version>0.0.2</version>
+  <version>999-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Quarkus Proxy Wasm - Parent</name>
 
@@ -24,7 +24,7 @@
     <developerConnection>scm:git:git@github.com:quarkiverse/quarkus-proxy-wasm.git</developerConnection>
     <url>https://github.com/quarkiverse/quarkus-proxy-wasm</url>
 
-    <tag>0.0.2</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <properties>
