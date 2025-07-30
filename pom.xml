@@ -36,7 +36,7 @@
     <quarkus.version>3.24.2</quarkus.version>
     <surefire-plugin.version>3.5.2</surefire-plugin.version>
     <chicory.version>1.4.0</chicory.version>
-    <proxy-wasm.version>0.0.4</proxy-wasm.version>
+    <proxy-wasm.version>0.0.5</proxy-wasm.version>
   </properties>
 
   <build>
