@@ -35,7 +35,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <quarkus.version>3.25.0</quarkus.version>
     <surefire-plugin.version>3.5.2</surefire-plugin.version>
-    <chicory.version>1.4.0</chicory.version>
+    <chicory.version>1.5.1</chicory.version>
     <proxy-wasm.version>0.0.5</proxy-wasm.version>
   </properties>
 
