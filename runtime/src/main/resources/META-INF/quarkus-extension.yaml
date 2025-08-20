@@ -12,4 +12,4 @@ metadata:
     - "WebAssembly"
   categories:
     - "web"
-  status: "development"
+  status: "experimental"
